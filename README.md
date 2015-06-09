@@ -1,5 +1,19 @@
 # freifunkcrawler
-Bash-Skript zum Sammeln der Anzahl der verbundenen Clients eines oder mehrerer Freifunk Router. PHP-Skript zum anzeigen als Diagramm.
+Bash-Skript zum Sammeln der Anzahl der verbundenen Clients eines oder mehrerer Freifunk Router. PHP-Skript zum anzeigen der gesammelten Daten als Diagramm.
+
+## Verwendung
+
+### Einrichtung
+
+Alle Dateien z.B. in ein Unterverzeichnis <code>stats</code> eines htdocs ablegen.
+
+Konfigurationsdatei <code>freifunkconfig.ini.example.php</code> nach <code>freifunkconfig.ini.php</code> kopieren und persönliche Einstellungen vornehmen.
+
+Ein Mal ... #TODO
+
+### Ausführung
+
+Das Skript <code>freifunkcrawler.sh</code> regelmäßig (z.B. alle halbe Stunde) via Cron-Job ausführen.
 
 # Autoren
 [Guenther Schmitz](https://github.com/gpunktschmitz) - http://www.gpunktschmitz.de
