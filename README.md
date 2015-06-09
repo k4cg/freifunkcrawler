@@ -5,8 +5,8 @@ Bash-Skript zum Sammeln der Anzahl der verbundenen Clients eines oder mehrerer F
 [Guenther Schmitz](https://github.com/gpunktschmitz) - http://www.gpunktschmitz.de
 
 # Lizenz
-PHP- und Bash-Skripte:
+## alle PHP- und Bash-Skripte:
 CC0 1.0 Universal <http://creativecommons.org/publicdomain/zero/1.0/>
 
-Chart.js (js/Chart.min.js)
+## Chart.js (js/Chart.min.js):<br />
 MIT <https://github.com/nnnick/Chart.js/blob/master/LICENSE.md>
