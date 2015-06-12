@@ -3,7 +3,7 @@ Bash-Skript zum Sammeln der Anzahl der verbundenen Clients eines oder mehrerer F
 
 ## Verwendung
 
-### Einrichtung
+### Einrichtung (Abrufen der Daten)
 
 Alle Dateien z.B. in ein Unterverzeichnis `stats` eines htdocs ablegen.
 
@@ -11,13 +11,19 @@ Konfigurationsdatei `freifunkconfig.ini.example.php` nach `freifunkconfig.ini.ph
 
 Das Skript zur Initialisierung mit dem Parameter `init` aufrufen:
 
-`bash freifunkcrawler.sh init`  
+`bash freifunkcrawler.sh init`
 
 Anschliessend kann man das Skript `freifunkcrawler.sh` (ohne Parameter!) regelmäßig (z.B. alle halbe Stunde) via Cron-Job ausführen.
 
 `*/15  *  *   *   *     bash /var/www/gpunktschmitz.de/www/stats/freifunkcrawler.sh`
 
 *Die Daten auf dem (Franken-)Netmon werden nur alle 10 Minuten aktualisiert, daher bringt eine niedrigere Aufrufrate keine aktuelleren Daten.*
+
+### Aufruf (Anzeigen der gesammelten Daten)
+
+Um sich die Statistik anzeigen zu lassen ruft man einfach die `freifunk.php`-Datei auf (diese kann auch beliebig umbenannt werden, z.b. `index.php`).
+
+Eine Anzeige ist erst dann möglich, wenn mindestens zwei Aufrufe des Skripts gemacht wurden (die Initialisierung zählt als ein Mal).
 
 # Autoren
 [Guenther Schmitz](https://github.com/gpunktschmitz) - http://www.gpunktschmitz.de
