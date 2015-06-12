@@ -27,6 +27,7 @@ netmonUrl=$(awk -F "=" '/netmonUrl/ {print $2}' $configFile)
 #-- SCRIPT
 crawlFreifunk() {
   paramRouterId=$1
+  date=$2
   url=$netmonUrl$paramRouterId
   case $urlRequester in
     "curl" )
@@ -55,7 +56,7 @@ crawlFreifunk() {
   fi
 
   [[ $clients == ?(-)+([0-9]) ]] && total=$(($total + $clients))
-  date=$(date +"%Y-%m-%d")
+
   time=$(date +"%H:%M")
   separator=";"
 
@@ -74,7 +75,6 @@ initFunction() {
 
   while [ $newRouterDone -eq 0 ]; do
     clear
-echo $dataFolder
     if [ $newRouterCounter -gt 0 ]; then
       echo -e "Hast du einen weiteren Router den du angeben möchtest?\n(Falls nein, einfach \"ENTER\" drücken)"
     fi
@@ -97,6 +97,20 @@ echo $dataFolder
       error="\n[[ERROR: NOT A NUMBER - YOU MUST ENTER A NUMBER]]"
     fi
   done
+}
+
+getMaximumValue() {
+  paramYesterday=$2
+  paramRouterId=$1
+  maximumFile="maximum"
+  separator=";"
+
+  maximum=$(awk -F";" '($2>=v){v=$2}END{print v}' $dataFolder/$paramRouterId/$paramYesterday)
+  output=$paramYesterday$separator$paramRouterId$separator$maximum$separator
+  echo $output>>$dataFolder/$maximumFile
+  if [ $chownString ]; then
+    chown $chownString $dataFolder/$maximumFile
+  fi
 }
 
 workingFolder=$(pwd)
@@ -161,22 +175,36 @@ fi
 #init counters
 total=0
 dirCounter=0
+date=$(date +"%Y-%m-%d")
 
-#parse data-folder and
-for D in `find $dataFolder -type d`
-do
+#parse data-folder and crawl each router
+for D in `find $dataFolder -type d`; do
   if [ $D != $dataFolder ]; then
     if [ ! -f $D/disabled ]; then
       routerId=$(basename $D)
       if [ $routerId != $totalDir ]; then
         ((dirCounter++))
-        crawlFreifunk $routerId
+        crawlFreifunk $routerId $date
       fi
     fi
   fi
 done
 
 if [ $dirCounter -ge 1 ]; then
+  if [ ! -f $totalFolder/$date ]; then
+    yesterday=$(date +"%Y-%m-%d" -d "yesterday")
+    if [ -f $totalFolder/$yesterday ]; then
+      for D in `find $dataFolder -type d`; do
+        if [ $D != $dataFolder ]; then
+          if [ -f $D/$yesterday ]; then
+            routerId=$(basename $D)
+            getMaximumValue $routerId $yesterday
+          fi
+        fi
+      done
+    fi
+  fi
+
   output=$time$separator$total$separator
   echo $output>>$totalFolder/$date
 
