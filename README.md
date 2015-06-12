@@ -15,7 +15,7 @@ Das Skript zur Initialisierung mit dem Parameter `init` aufrufen:
 Anschliessend kann man das Skript `freifunkcrawler.sh` (ohne Parameter!) regelmäßig (z.B. alle halbe Stunde) via Cron-Job ausführen.
 `*/15  *  *   *   *     bash /var/www/gpunktschmitz.de/www/stats/freifunkcrawler.sh`
 
-Die Daten auf dem (Franken-)Netmon werden nur alle 10 Minuten aktualisiert, daher bringt eine niedrigere Aufrufrate keine aktuelleren Daten.
+*Die Daten auf dem (Franken-)Netmon werden nur alle 10 Minuten aktualisiert, daher bringt eine niedrigere Aufrufrate keine aktuelleren Daten.*
 
 # Autoren
 [Guenther Schmitz](https://github.com/gpunktschmitz) - http://www.gpunktschmitz.de
