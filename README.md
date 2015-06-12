@@ -1,5 +1,5 @@
 # freifunkcrawler
-Bash-Skript zum Sammeln der Anzahl der verbundenen Clients eines oder mehrerer Freifunk Router. PHP-Skript zum anzeigen der gesammelten Daten als Diagramm.
+Bash-Skript zum Sammeln der Anzahl der verbundenen Clients eines oder mehrerer Freifunk Router. PHP-Skript zum Anzeigen der gesammelten Daten als Diagramm.
 
 ## Verwendung
 
@@ -9,11 +9,12 @@ Alle Dateien z.B. in ein Unterverzeichnis `stats` eines htdocs ablegen.
 
 Konfigurationsdatei `freifunkconfig.ini.example.php` nach `freifunkconfig.ini.php` kopieren und persönliche Einstellungen vornehmen.
 
-Ein Mal ... #TODO
+Das Skript zur Initialisierung mit dem Parameter `init` aufrufen:
+`bash freifunkcrawler.sh init`  
 
-### Ausführung
+Anschliessend kann man das Skript `freifunkcrawler.sh` (ohne Parameter!) regelmäßig (z.B. alle halbe Stunde) via Cron-Job ausführen.
 
-Das Skript `freifunkcrawler.sh` regelmäßig (z.B. alle halbe Stunde) via Cron-Job ausführen.
+Die Daten auf dem (Franken-)Netmon werden nur alle 10 Minuten aktualisiert, daher bringt eine niedrigere Aufrufrate keine aktuelleren Daten.
 
 # Autoren
 [Guenther Schmitz](https://github.com/gpunktschmitz) - http://www.gpunktschmitz.de
