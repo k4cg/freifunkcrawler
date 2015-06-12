@@ -9,6 +9,21 @@ Alle Dateien z.B. in ein Unterverzeichnis `stats` eines htdocs ablegen.
 
 Konfigurationsdatei `freifunkconfig.ini.example.php` nach `freifunkconfig.ini.php` kopieren und persönliche Einstellungen vornehmen.
 
+    title=freifunkstats
+    dataDir=./freifunkdata
+    totalDir=Total
+    netmonUrl=https://netmon.freifunk-franken.de/api/rest/router/
+    urlRequester=curl
+    chownUser=
+    chownGroup=
+    
+* `title`: Titel des PHP-Skripts
+* `dataDir`: Datenstammverzeichnis für die abgefragten Daten; kann realtiv zum ausführenden Skript (mit einem `.` als erstes Zeichen) oder absolut (mit einem `/` als erstes Zeichen) angegeben werden
+* `totalDir`: Unterverzeichnis von `dataDir` in das die Summenwerte gespeichert werden
+* `netmonUrl`: Url zur XML-API des Netmon
+* `urlRequester`: Programm zum Abrufen der `netmonUrl` (`curl` oder `php`, da manche Webhoster z.B. kein `curl` anbieten)
+* `chownUser` und `chownGroup`: Wenn das Bash-Skript von einem anderen Benutzer ausgeführt und der Webserver unter einem anderen Benutzer läuft, der dann auf die Datendateien keinen Zugriff hätte, kann man hier entsprechende Werte angeben. Nach dem Speichern der Datendateien werden die Zugriffsrechte entsprechend gesetzt.
+
 Das Skript zur Initialisierung mit dem Parameter `init` aufrufen:
 
 `bash freifunkcrawler.sh init`
