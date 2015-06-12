@@ -25,7 +25,30 @@ Um sich die Statistik anzeigen zu lassen ruft man einfach die `freifunk.php`-Dat
 
 Eine Anzeige ist erst dann möglich, wenn mindestens zwei Aufrufe des Skripts gemacht wurden (die Initialisierung zählt als ein Mal).
 
+### Datenstruktur (wie es funktioniert)
+
+Das Skript `freifunkcrawler.sh` legt mit dem ersten Aufruf mit dem Parameter `init` für jeden Router ein Verzeichnis im "data folder" an.
+
+    freifunkdata\
+                \44
+                \966
+                \967
+                \968
+                \969
+                \970
+
+Die Anzahl der verbundenen Clients wird im jeweiligen Router-Verzeichnis in eine Datei im Datumsformat `YYYY-MM-DD` abgespeichert.
+
+### Router benennen
+
+Möchte man im Diagramm anstelle der Routernummer einen Namen anzeigen so erstellt man eine Datei `hostname` im jeweiligen Router-Verzeichnis mit dem anzuzeigenden Namen als Inhalt. Der Name wird dann beim Mouse-Over-Effekt angezeigt.
+
+### Routerabfrage beenden/aussetzen
+
+Möchte man einen Router nicht mehr abfragen, so kann man eine Datei namens `disabled` in das Verzeichnis legen. Somit bleiben die historischen Daten bestehen und die Daten des Router werden nicht mehr aktualisiert.
+
 # Autoren
+
 [Guenther Schmitz](https://github.com/gpunktschmitz) - http://www.gpunktschmitz.de
 
 # Lizenz
