@@ -1,12 +1,28 @@
 #!/bin/sh
 
+parameter="${1:-$FALSE}"
+
+if [ $parameter ]; then
+  if [ ! $parameter == "init" ]; then
+    echo "ERROR: parameter given is not \"init\" .. execution aborted"
+    exit 1
+  fi
+fi
+
+configFile="freifunkconfig.ini.php"
+
+if [ ! -f $configFile ]; then
+  echo "ERROR: config file not present/found .. execution aborted"
+  exit 1
+fi
+
 #-- SETTINGS
-chownUser=$(awk -F "=" '/chownUser/ {print $2}' freifunkconfig.ini.php)
-chownGroup=$(awk -F "=" '/chownGroup/ {print $2}' freifunkconfig.ini.php)
-dataDir=$(awk -F "=" '/dataDir/ {print $2}' freifunkconfig.ini.php)
-totalDir=$(awk -F "=" '/totalDir/ {print $2}' freifunkconfig.ini.php)
-urlRequester=$(awk -F "=" '/urlRequester/ {print $2}' freifunkconfig.ini.php)
-netmonUrl=$(awk -F "=" '/netmonUrl/ {print $2}' freifunkconfig.ini.php)
+chownUser=$(awk -F "=" '/chownUser/ {print $2}' $configFile)
+chownGroup=$(awk -F "=" '/chownGroup/ {print $2}' $configFile)
+dataDir=$(awk -F "=" '/dataDir/ {print $2}' $configFile)
+totalDir=$(awk -F "=" '/totalDir/ {print $2}' $configFile)
+urlRequester=$(awk -F "=" '/urlRequester/ {print $2}' $configFile)
+netmonUrl=$(awk -F "=" '/netmonUrl/ {print $2}' $configFile)
 
 #-- SCRIPT
 crawlFreifunk() {
@@ -51,7 +67,38 @@ crawlFreifunk() {
   fi
 }
 
-#set data-folder
+initFunction() {
+  newRouterCounter=0
+  newRouterDone=0
+  error=""
+
+  while [ $newRouterDone -eq 0 ]; do
+    clear
+echo $dataFolder
+    if [ $newRouterCounter -gt 0 ]; then
+      echo -e "Hast du einen weiteren Router den du angeben möchtest?\n(Falls nein, einfach \"ENTER\" drücken)"
+    fi
+    echo -e "Bitte die Id des zu beobachtenden Freifunk Router angeben$error:"
+    read newRouterId
+    error=""
+
+    if [ "$newRouterId" -eq "$newRouterId" ] 2>/dev/null; then
+      mkdir $dataFolder/$newRouterId
+      if [ $chownString ]; then
+        chown $chownString $totalFolder
+      fi
+      ((newRouterCounter++))
+    else
+      if [ -z $newRouterId ]; then
+        if [ $newRouterCounter -gt 0 ]; then
+          newRouterDone=1
+        fi
+      fi
+      error="\n[[ERROR: NOT A NUMBER - YOU MUST ENTER A NUMBER]]"
+    fi
+  done
+}
+
 workingFolder=$(pwd)
 if [ ! $dataFolder ]; then
   dataFolder=$workingFolder/"freifunkdata"
@@ -77,25 +124,37 @@ if [ $chownGroup ]; then
   chownString="$chownString:$chownGroup"
 fi
 
-#check existence of data-folder and create if it doesn't
-if [ ! -d $dataFolder ]; then
-  mkdir $dataFolder
-  if [ $chownString ]; then
-    chown $chownString $dataFolder
-  fi
-fi
-
 #abort script if data-folder could not be created
 if [ ! -d $dataFolder ]; then
-  echo "error creating `dataFolder` \"$dataFolder\"" 1>&2
+  echo "ERROR: data folder \"$dataFolder\" does not exist"
+  echo "run the script with the parameter \"$init\" to create data folder structure"
   exit 1
 fi
 
-#check existence of total-folder and create if it doesn't
-if [ ! -d $totalFolder ]; then
-  mkdir $totalFolder
-  if [ $chownString ]; then
-    chown $chownString $totalFolder
+if [ $parameter ]; then
+  #check existence of data-folder and create it if it doesn't
+  if [ ! -d $dataFolder ]; then
+    mkdir $dataFolder
+    if [ $chownString ]; then
+      chown $chownString $dataFolder
+    fi
+  fi
+
+  #abort script if data-folder could not be created
+  if [ ! -d $dataFolder ]; then
+    echo "ERROR: creating data folder \"$dataFolder\""
+    echo "check permissions"
+    exit 1
+  fi
+
+  #check existence of total-folder and create it if it doesn't
+  if [ ! -d $totalFolder ]; then
+    mkdir $totalFolder
+    if [ $chownString ]; then
+      chown $chownString $totalFolder
+    fi
+
+    initFunction
   fi
 fi
 

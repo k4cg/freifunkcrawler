@@ -1,4 +1,11 @@
 <?php
+//TODO idea: if init-setup done show message like:
+
+/* 
+ * checked data structure .. seems to be ok
+ * to few data to show graphs .. run the scritp at least one more time
+ */
+
 date_default_timezone_set('Europe/Berlin');
 define('DS', DIRECTORY_SEPARATOR);
 
@@ -19,48 +26,102 @@ if(!isset($dataDir)) {
   $dataDir = 'freifunkdata';
 }
 
-define('DATADIR', dirname(__FILE__) . DS . $dataDir . DS);
+$dataDirFirstChar = substr($dataDir, 0, 1);
+if($dataDirFirstChar == '/') {
+  define('DATADIR', $dataDir . DS);
+} elseif ($dataDirFirstChar == '.') {
+  if(substr($dataDir, 1, 1) == '/') {
+    $dataDir = substr($dataDir, 2);
+  } else {
+    $dataDir = substr($dataDir, 1);
+  }
+  define('DATADIR', dirname(__FILE__) . DS . $dataDir . DS);
+}
+
 
 if(!isset($netmonUrl)) {
-  die('settings "netmonUrl" missing!');
+  die('settings "netmonUrl" missing in config file!');
 }
 
 if(!isset($title)) {
   $title = 'freifunkstats';
 }
 
+if(!isset($totalDir)) {
+  $totalDir = 'Total';
+}
+
+define('TOTALDIR', DATADIR . $totalDir . DS);
+
 $date = checkDateParameterOrRedirect();
+$statsDayArray = returnStatsDayArray($date);
 
-$statsMaximumMedianArray = returnStatsMaximumMedianArray();
+$maximumPerDayChartData = FALSE;
+$dayChartData = FALSE;
 
-if(count($statsMaximumMedianArray) > 0) {
-  $statsDayArray = returnStatsDayArray($date);
+if($statsDayArray) {
   $navigation = returnNavigation($date);
   $coloursArray = returnColoursArray(count($statsDayArray));
-  $maximumMedianChartData = returnChartData($statsMaximumMedianArray, 'maximum', $coloursArray, 'maximumMedianChart');
-  $dayChartData = returnChartData($statsDayArray, 'Total', $coloursArray, 'dayChart');
+  $dayChartData = returnChartData($statsDayArray, $totalDir, $coloursArray, 'dayChart');
+  $statsMaximumPerDayArray = returnStatsMaximumArray($totalDir);
+  if($statsMaximumPerDayArray) {
+  	$maximumPerDayChartData = returnChartData($statsMaximumPerDayArray, 'maximum', $coloursArray, 'maximumPerDayChart');
+  }
+}
+
+$maximumPerDayCanvas = '';
+if($maximumPerDayChartData) {
+  $maximumPerDayCanvas = <<< CANVAS
+    <div>
+	  <h1>connected clients - maximum per day view</h1>
+	  <canvas id="maximumPerDayChart" height="100" width="900"></canvas>
+    </div>
+CANVAS;
+}
+
+$dayCanvas = ''; 
+if($dayChartData) {
+  $dayCanvas = <<< CANVAS
+    <div>
+      <h1>connected clients - day view - $date</h1>
+      <canvas id="dayChart" height="250" width="900"></canvas>
+    </div>
+CANVAS;
+}
+
+if(strlen($maximumPerDayCanvas)+strlen($dayCanvas) == 0) {
+  //TODO test error message.
+  $errorMessage = <<< ERROR
+    <div>
+      <h1 style="color:red;">ERROR - to few data</h1>
+      <p>there seems to be too few data .. please run the script at least two times to gather enough data to show a graph</p>
+    </div>
+ERROR;
+  $dayCanvas = $errorMessage;
 }
 
 function returnChartData($dataArray, $timeStringKey, $coloursArray, $chartName) {
+  $chartData = FALSE;
   $dataArrayKeys = array_keys($dataArray);
-  $labels = $dataArray[$timeStringKey]['timeString'];
-  $chartName .= 'Data';
-  $chartData = <<< CHARTHEAD
+  if(count(explode(',', $dataArray[$timeStringKey]['timeString']))>1) {
+    $labels = $dataArray[$timeStringKey]['timeString'];
+    $chartName .= 'Data';
+    $chartData = <<< CHARTHEAD
 var $chartName = {
 labels : [$labels],
 datasets : [
 CHARTHEAD;
 
-  $counter = 0;
-  foreach($dataArray as $array) {
-    $label = $dataArrayKeys[$counter];
-    $hostnameFile = DATADIR . $label . DS . 'hostname';
-    if(file_exists($hostnameFile)) {
-      $label = trim(file_get_contents($hostnameFile));
-    }
-    $colour = $coloursArray[$counter];
-    $data = $dataArray[$dataArrayKeys[$counter]]['valueString'];
-    $chartData .= <<<CHARTDATA
+    $counter = 0;
+    foreach($dataArray as $array) {
+      $label = $dataArrayKeys[$counter];
+      $hostnameFile = DATADIR . $label . DS . 'hostname';
+      if(file_exists($hostnameFile)) {
+        $label = trim(file_get_contents($hostnameFile));
+      }
+      $colour = $coloursArray[$counter];
+      $data = $dataArray[$dataArrayKeys[$counter]]['valueString'];
+      $chartData .= <<<CHARTDATA
 {
   label: "$label",
   fillColor : "rgba($colour,0.2)",
@@ -73,12 +134,13 @@ CHARTHEAD;
 }
 CHARTDATA;
 
-    if(count($dataArray)-1 != $counter) {
-      $chartData .= ",\n";
+      if(count($dataArray)-1 != $counter) {
+        $chartData .= ",\n";
+      }
+      $counter++;
     }
-    $counter++;
+    $chartData .= "\n]\n}\n";
   }
-  $chartData .= "\n]\n}\n";
   return $chartData;
 }
 
@@ -97,7 +159,7 @@ function returnNavigation($date) {
   $scriptName = $_SERVER["SCRIPT_NAME"];
   $previousDay = date("Ymd", strtotime("$date -1 days"));
   $nextDay = date("Ymd", strtotime("$date +1 days"));
-  $dir = DATADIR . 'Total' . DS;
+  $dir = TOTALDIR;
   
   if(file_exists($dir . dateDashFormat($previousDay))) {
     $previousDayDashFormat = dateDashFormat($previousDay);
@@ -132,7 +194,12 @@ function checkDateParameterOrRedirect() {
       die();
     }
   } else {
-    header('Location: //' . $_SERVER["HTTP_HOST"] . $_SERVER["SCRIPT_NAME"] . '?date=' . $yesterday);
+  	if(file_exists(TOTALDIR . dateDashFormat($yesterday))) {
+  	  $dateParam = $yesterday;
+  	} else {
+  	  $dateParam = date('Ymd');
+  	}
+    header('Location: //' . $_SERVER["HTTP_HOST"] . $_SERVER["SCRIPT_NAME"] . '?date=' . $dateParam);
     die();
   }
 }
@@ -181,6 +248,7 @@ function returnStatsDayArray($date) {
   $directories = scandir(DATADIR);
   
   foreach($directories as $dir) {
+  	//TODO SET YESTERDAY IF GIVEN DATE DOESNT EXIST
     if($dir != '.' && $dir != '..') {
       $currentFolder = $dir;
       $dir = DATADIR . $dir . DS;
@@ -194,31 +262,33 @@ function returnStatsDayArray($date) {
       }
     }
   }
+  if(count($returnArray)>0) {
+    return reorderStatsDayArray($returnArray);
+  } else {
+  	return FALSE;
+  }
   
-  $returnArray = reorderStatsDayArray($returnArray);
-  
-  return $returnArray;
 }
 
 function reorderStatsDayArray($array) {
-  //this tweak reorders the folders in the array so that "Total" is the very first one (looks better onmouseover)
+  //this tweak reorders the folders in the array so that the total-folder is the very first one (looks better onmouseover)
   $tmpArray = $array;
   $totalArray = array_splice($tmpArray, count($tmpArray)-1, 1);
   $array = $totalArray + $array;
   return $array;
 }
 
-function returnStatsMaximumMedianArray() {
+function returnStatsMaximumArray($totalDir) {
   $returnArray = Array();
-  $perDayFilesArray = Array('maximum', 'median');
-  foreach($perDayFilesArray as $perDayFile) {
-    $column = $perDayFile;
-    if($perDayFile == 'maximum') {
-      $column = 'Total';
-    }
-    $returnArray[$perDayFile] = readCsvFile(DATADIR . $perDayFile, $column);
+  $perDayFile= 'maximum';
+  $column = $totalDir;
+
+  $tmpVal = readCsvFile(DATADIR . $perDayFile, $column);
+  if(!empty($tmpVal)) {
+    $returnArray[$perDayFile] = $tmpVal;
   }
-  if(count($returnArray) > 1) {
+  
+  if(count($returnArray) > 0) {
     return $returnArray;
   } else {
     return FALSE;
@@ -237,18 +307,12 @@ $html = <<<HTML
 <div style="width: 95%; margin: auto;">
   <div>
 $navigation
-    <div>
-      <h1>connected clients - maximum/median per day view</h1>
-      <canvas id="maximumMedianChart" height="100" width="900"></canvas>
-    </div>
-    <div>
-      <h1>connected clients - day view - $date</h1>
-      <canvas id="dayChart" height="250" width="900"></canvas>
-    </div>
+$maximumPerDayCanvas
+$dayCanvas
   </div>
 </div>
 <script>
-$maximumMedianChartData
+$maximumPerDayChartData
 $dayChartData
 window.onload = function(){
   var ctx = document.getElementById("dayChart").getContext("2d");
@@ -259,8 +323,8 @@ window.onload = function(){
     pointHitDetectionRadius: 4,
     multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>"
   });
-  var qwe = document.getElementById("maximumMedianChart").getContext("2d");
-  window.perDayChart = new Chart(qwe).Line(maximumMedianChartData, {
+  var qwe = document.getElementById("maximumPerDayChart").getContext("2d");
+  window.perDayChart = new Chart(qwe).Line(maximumPerDayChartData, {
     scaleBeginAtZero: true,
     responsive: true,
     animation: false,
