@@ -39,7 +39,7 @@ crawlFreifunk() {
       grepParam="(?<=Clients:</b> ).*?(?=<br>)"
       ;;
     * )
-      echo "setting `netmonUrl` not proper set in config file" 1>&2
+      echo "ERROR: setting \"netmonUrl\" not proper set in config file" 1>&2
       exit 1
       ;;
   esac
@@ -141,7 +141,7 @@ fi
 #abort script if data-folder could not be created
 if [ ! -d $dataFolder ]; then
   echo "ERROR: data folder \"$dataFolder\" does not exist"
-  echo "run the script with the parameter \"$init\" to create data folder structure"
+  echo "run the script with the parameter \"init\" to create data folder structure"
   exit 1
 fi
 
