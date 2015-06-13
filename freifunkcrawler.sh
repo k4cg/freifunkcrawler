@@ -1,5 +1,4 @@
 #!/bin/sh
-
 parameter="${1:-$FALSE}"
 
 if [ $parameter ]; then
@@ -9,7 +8,16 @@ if [ $parameter ]; then
   fi
 fi
 
-configFile="freifunkconfig.ini.php"
+#get working directory (http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in)
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  workingFolder="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$workingFolder/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+workingFolder="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+configFile=$workingFolder"/freifunkconfig.ini.php"
 
 if [ ! -f $configFile ]; then
   echo "ERROR: config file not present/found .. execution aborted"
