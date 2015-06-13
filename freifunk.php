@@ -1,11 +1,4 @@
 <?php
-//TODO idea: if init-setup done show message like:
-
-/* 
- * checked data structure .. seems to be ok
- * to few data to show graphs .. run the scritp at least one more time
- */
-
 date_default_timezone_set('Europe/Berlin');
 define('DS', DIRECTORY_SEPARATOR);
 
@@ -90,13 +83,22 @@ CANVAS;
 }
 
 if(strlen($maximumPerDayCanvas)+strlen($dayCanvas) == 0) {
-  //TODO test error message.
-  $errorMessage = <<< ERROR
+  if(!file_exists($dataDir . '/' . $totalDir)) {
+    $errorMessage = <<< ERROR
     <div>
-      <h1 style="color:red;">ERROR - to few data</h1>
+      <h1 style="color:red;">ERROR - data structure missing</h1>
+      <p>no data found .. please run the script with the parameter "init" to set things up</p>
+      <span style="border: 1px solid #666; background-color: #aaa; padding: 5px;">bash freifunkcrawler.sh init</span>
+    </div>
+ERROR;
+  } else {
+    $errorMessage = <<< ERROR
+    <div>
+      <h1 style="color:red;">ERROR - too few data</h1>
       <p>there seems to be too few data .. please run the script at least two times to gather enough data to show a graph</p>
     </div>
 ERROR;
+  }
   $dayCanvas = $errorMessage;
 }
 
