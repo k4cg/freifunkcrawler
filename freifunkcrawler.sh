@@ -8,16 +8,8 @@ if [ $parameter ]; then
   fi
 fi
 
-#get working directory (http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in)
-SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  workingFolder="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-  SOURCE="$(readlink "$SOURCE")"
-  [[ $SOURCE != /* ]] && SOURCE="$workingFolder/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-done
-workingFolder="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-
-configFile=$workingFolder"/freifunkconfig.ini.php"
+workingFolder="$(dirname ${BASH_SOURCE[0]})"
+configFile="$workingFolder/freifunkconfig.ini.php"
 
 if [ ! -f $configFile ]; then
   echo "ERROR: config file not present/found .. execution aborted"
@@ -49,14 +41,8 @@ crawlFreifunk() {
       exit 1
       ;;
   esac
+
   grepParam="(?<=client_count>)[^<]+"
-  #grepParam="(?<=Clients:</b> ).*?(?=<br>)"
-  #url="https://netmon.freifunk-franken.de/api/rest/router/$paramRouterId"
-  #clients=$(php $workingFolder/fileGetContents.php $xml | grep -oP '(?<=client_count>)[^<]+')
-  #url="https://netmon.freifunk-franken.de/router.php?router_id=$paramRouterId"
-  #clients=$(php $workingFolder/fileGetContents.php $url | grep -oP '(?<=Clients:</b> ).*?(?=<br>)')
-  #url="https://netmon.freifunk-franken.de/router.php?router_id=$paramRouterId"
-  #clients=$(curl -s $url | grep -oP '(?<=Clients:</b> ).*?(?=<br>)')
   clients=$($command $url | grep -oP $grepParam)
 
   if [ -z "$clients" ]; then
@@ -105,6 +91,7 @@ initFunction() {
       error="\n[[ERROR: NOT A NUMBER - YOU MUST ENTER A NUMBER]]"
     fi
   done
+  echo "working on it ..."
 }
 
 getMaximumValue() {
@@ -121,20 +108,19 @@ getMaximumValue() {
   fi
 }
 
-workingFolder=$(pwd)
 if [ ! $dataFolder ]; then
-  dataFolder=$workingFolder/"freifunkdata"
+  dataFolder="$workingFolder/freifunkdata"
 elif [ $(echo ${dataFolder} | cut -c1-1) -eq "." ]; then
   dataFolder=$workingFolder/$(echo ${dataFolder} | tail -c +3)
 elif [ $(echo ${dataFolder} | cut -c1-1) -eq "/" ]; then
   dataFolder=$dataFolder
 else
-  dataFolder=$workingFolder/"freifunkdata"
+  dataFolder="$workingFolder/freifunkdata"
 fi
 
 #set total-folder
 if [ ! $totalFolder ]; then
-  totalFolder=$dataFolder/"Total"
+  totalFolder="$dataFolder/Total"
 fi
 
 #set chown user and group
@@ -146,6 +132,7 @@ if [ $chownGroup ]; then
   chownString="$chownString:$chownGroup"
 fi
 
+#if init parameter do setup
 if [ $parameter ]; then
   #check existence of data-folder and create it if it doesn't
   if [ ! -d $dataFolder ]; then
