@@ -32,17 +32,17 @@ crawlFreifunk() {
   case $urlRequester in
     "curl" )
       command="curl -s"
-      grepParam="(?<=client_count>)[^<]+"
       ;;
     "php" )
       command="php $workingFolder/fileGetContents.php"
-      grepParam="(?<=Clients:</b> ).*?(?=<br>)"
       ;;
     * )
       echo "ERROR: setting \"netmonUrl\" not proper set in config file" 1>&2
       exit 1
       ;;
   esac
+  grepParam="(?<=client_count>)[^<]+"
+  #grepParam="(?<=Clients:</b> ).*?(?=<br>)"
   #url="https://netmon.freifunk-franken.de/api/rest/router/$paramRouterId"
   #clients=$(php $workingFolder/fileGetContents.php $xml | grep -oP '(?<=client_count>)[^<]+')
   #url="https://netmon.freifunk-franken.de/router.php?router_id=$paramRouterId"
@@ -138,13 +138,6 @@ if [ $chownGroup ]; then
   chownString="$chownString:$chownGroup"
 fi
 
-#abort script if data-folder could not be created
-if [ ! -d $dataFolder ]; then
-  echo "ERROR: data folder \"$dataFolder\" does not exist"
-  echo "run the script with the parameter \"init\" to create data folder structure"
-  exit 1
-fi
-
 if [ $parameter ]; then
   #check existence of data-folder and create it if it doesn't
   if [ ! -d $dataFolder ]; then
@@ -170,6 +163,13 @@ if [ $parameter ]; then
 
     initFunction
   fi
+fi
+
+#abort script if data-folder could not be created
+if [ ! -d $dataFolder ]; then
+  echo "ERROR: data folder \"$dataFolder\" does not exist"
+  echo "run the script with the parameter \"init\" to create data folder structure"
+  exit 1
 fi
 
 #init counters
