@@ -14,6 +14,7 @@ Konfigurationsdatei `freifunkconfig.ini.example.php` nach `freifunkconfig.ini.ph
     totalDir=Total
     netmonUrl=https://netmon.freifunk-franken.de/api/rest/router/
     urlRequester=curl
+    inlineJavaScript=false
     chownUser=
     chownGroup=
     
@@ -22,6 +23,7 @@ Konfigurationsdatei `freifunkconfig.ini.example.php` nach `freifunkconfig.ini.ph
 * `totalDir`: Unterverzeichnis von `dataDir` in das die Summenwerte gespeichert werden
 * `netmonUrl`: Url zur XML-API des Netmon
 * `urlRequester`: Programm zum Abrufen der `netmonUrl` (`curl` oder `php`, da manche Webhoster z.B. kein `curl` anbieten)
+* `inlineJavaScript`: `false` bindet die JavaScript-Datei ein; `true` bettet den Inhalt der JavaScript-Datei in `freifunk.php` ein
 * `chownUser` und `chownGroup`: Wenn das Bash-Skript von einem anderen Benutzer ausgeführt und der Webserver unter einem anderen Benutzer läuft, der dann auf die Datendateien keinen Zugriff hätte, kann man hier entsprechende Werte angeben. Nach dem Speichern der Datendateien werden die Zugriffsrechte entsprechend gesetzt.
 
 Das Skript zur Initialisierung mit dem Parameter `init` aufrufen:
