@@ -72,7 +72,7 @@ $maximumPerDayCanvas = '';
 if($maximumPerDayChartData) {
   $maximumPerDayCanvas = <<< CANVAS
     <div>
-	  <h1>connected clients - maximum per day view</h1>
+	  <h1>verbundene Clients - Maximum Tagesansicht</h1>
 	  <canvas id="maximumPerDayChart" height="100" width="900"></canvas>
     </div>
 CANVAS;
@@ -82,7 +82,7 @@ $dayCanvas = '';
 if($dayChartData) {
   $dayCanvas = <<< CANVAS
     <div>
-      <h1>connected clients - day view - $date</h1>
+      <h1>verbundene Clients - Tagesansicht - $date</h1>
       <canvas id="dayChart" height="250" width="900"></canvas>
     </div>
 CANVAS;
@@ -92,16 +92,16 @@ if(strlen($maximumPerDayCanvas)+strlen($dayCanvas) == 0) {
   if(!file_exists($dataDir . '/' . $totalDir)) {
     $errorMessage = <<< ERROR
     <div>
-      <h1 style="color:red;">ERROR - data structure missing</h1>
-      <p>no data found .. please run the script with the parameter "init" to set things up</p>
+      <h1 style="color:red;">FEHLER - Datenstruktur nicht vorhanden</h1>
+      <p>Es wurden keine Daten gefunden .. Bitte f&uuml;hre das Skript mit dem Parameter "init" aus um die Datenstruktur einzurichten.</p>
       <span style="border: 1px solid #666; background-color: #aaa; padding: 5px;">bash freifunkcrawler.sh init</span>
     </div>
 ERROR;
   } else {
     $errorMessage = <<< ERROR
     <div>
-      <h1 style="color:red;">ERROR - too few data</h1>
-      <p>there seems to be too few data .. please run the script at least two times to gather enough data to show a graph</p>
+      <h1 style="color:red;">FEHLER - zu wenig Daten</h1>
+      <p>Es sind zu wenige Daten vorhanden .. Bitte f&uuml;hre das Skript mindestens zwei Mal aus um gen&uuml;gend Daten f&uuml;r die Anzeige zu sammeln.</p>
     </div>
 ERROR;
   }

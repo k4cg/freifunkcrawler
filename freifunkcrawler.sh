@@ -13,7 +13,7 @@ if [ $parameter ]; then
   if [ ! $parameter == "init" ]; then
     echoError "FEHLER: Der angehängt Parameter ist nicht \"init\" .. Ausführung abgebrochen."
   else
-    initParameter=true
+    initParameter="true"
   fi
 fi
 
@@ -172,7 +172,7 @@ if [ $parameter ]; then
 
     initFunction
   else
-    initParameter=false
+    initParameter="false"
   fi
 fi
 
