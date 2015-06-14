@@ -66,7 +66,7 @@ Um neue Router abzufragen muss lediglich im Datenverzeichnis ein Verzeichnis mit
 
 ### Routerabfrage beenden/aussetzen
 
-Möchte man einen Router nicht mehr abfragen, so kann man eine Datei namens `disabled` in das Verzeichnis legen. Somit bleiben die historischen Daten bestehen und die Daten des Router werden nicht mehr aktualisiert.
+Möchte man einen Router nicht mehr abfragen, so kann man eine Datei namens `disabled` in das Verzeichnis legen. Somit bleiben die historischen Daten bestehen und die Daten des Router werden nicht mehr aktualisiert. Um die Abfrage wieder zu aktivieren muss die Datei `disabled` gelöscht werden.
 
 # Autoren
 

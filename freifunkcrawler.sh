@@ -12,6 +12,8 @@ echoError() {
 if [ $parameter ]; then
   if [ ! $parameter == "init" ]; then
     echoError "FEHLER: Der angehängt Parameter ist nicht \"init\" .. Ausführung abgebrochen."
+  else
+    initParameter=true
   fi
 fi
 
@@ -169,6 +171,8 @@ if [ $parameter ]; then
     fi
 
     initFunction
+  else
+    initParameter=false
   fi
 fi
 
@@ -218,4 +222,6 @@ if [ $dirCounter -ge 1 ]; then
   fi
 fi
 
-echo -e "\nFertig.\n\nDu kannst nun das Skript in deinem Cron eintragen, z.B. wie folgt um alle 30 Minuten die Anzahl der verbundenen Clients abzufragen:\n*/30 * * * * bash $workingDir/freifunkcrawler.sh"
+if [ "$initParameter" == "true" ]; then
+  echo -e "\nFertig.\n\nDu kannst nun das Skript in deinem Cron eintragen, z.B. wie folgt um alle 30 Minuten die Anzahl der verbundenen Clients abzufragen:\n*/30 * * * * bash $workingDir/freifunkcrawler.sh"
+fi
