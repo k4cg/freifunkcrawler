@@ -18,7 +18,7 @@ Konfigurationsdatei `freifunkconfig.ini.example.php` nach `freifunkconfig.ini.ph
     chownUser=
     chownGroup=
     
-* `title`: Titel des PHP-Skripts
+* `title`: HTML-Titel des PHP-Skripts
 * `dataDir`: Datenstammverzeichnis für die abgefragten Daten; kann realtiv zum ausführenden Skript (mit einem `.` als erstes Zeichen) oder absolut (mit einem `/` als erstes Zeichen) angegeben werden
 * `totalDir`: Unterverzeichnis von `dataDir` in das die Summenwerte gespeichert werden
 * `netmonUrl`: Url zur XML-API des Netmon
@@ -38,7 +38,7 @@ Anschliessend kann man das Skript `freifunkcrawler.sh` (ohne Parameter!) regelm�
 
 ### Aufruf (Anzeigen der gesammelten Daten)
 
-Um sich die Statistik anzeigen zu lassen ruft man einfach die `freifunk.php`-Datei auf (diese kann auch beliebig umbenannt werden, z.b. `index.php`).
+Um sich die Statistik anzeigen zu lassen ruft man einfach die `freifunk.php`-Datei auf (diese kann auch beliebig umbenannt werden, z.B. `index.php`).
 
 Eine Anzeige ist erst dann möglich, wenn mindestens zwei Aufrufe des Skripts gemacht wurden (die Initialisierung zählt als ein Mal).
 
@@ -59,6 +59,10 @@ Die Anzahl der verbundenen Clients wird im jeweiligen Router-Verzeichnis in eine
 ### Router benennen
 
 Möchte man im Diagramm anstelle der Routernummer einen Namen anzeigen so erstellt man eine Datei `hostname` im jeweiligen Router-Verzeichnis mit dem anzuzeigenden Namen als Inhalt. Der Name wird dann beim Mouse-Over-Effekt angezeigt.
+
+### neue Router hinzufügen
+
+Um neue Router abzufragen muss lediglich im Datenverzeichnis ein Verzeichnis mit der Routernummer angelegt werden. Das Skript fragt die Anzahl der verbundenen Clients für alle Unterverzeichnisse ab.
 
 ### Routerabfrage beenden/aussetzen
 
