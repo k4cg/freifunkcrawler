@@ -8,8 +8,8 @@ if [ $parameter ]; then
   fi
 fi
 
-workingFolder="$(dirname ${BASH_SOURCE[0]})"
-configFile="$workingFolder/freifunkconfig.ini.php"
+workingDir="$(dirname ${BASH_SOURCE[0]})"
+configFile="$workingDir/freifunkconfig.ini.php"
 
 if [ ! -f $configFile ]; then
   echo "ERROR: config file not present/found .. execution aborted"
@@ -34,7 +34,7 @@ crawlFreifunk() {
       command="curl -s"
       ;;
     "php" )
-      command="php $workingFolder/fileGetContents.php"
+      command="php $workingDir/fileGetContents.php"
       ;;
     * )
       echo "ERROR: setting \"netmonUrl\" not proper set in config file" 1>&2
@@ -55,10 +55,10 @@ crawlFreifunk() {
   separator=";"
 
   output=$time$separator$clients$separator
-  echo $output>>$dataFolder/$paramRouterId/$date
+  echo $output>>$dataDir/$paramRouterId/$date
 
   if [ $chownString ]; then
-    chown $chownString $dataFolder/$paramRouterId/$date
+    chown $chownString $dataDir/$paramRouterId/$date
   fi
 }
 
@@ -77,9 +77,9 @@ initFunction() {
     error=""
 
     if [ "$newRouterId" -eq "$newRouterId" ] 2>/dev/null; then
-      mkdir $dataFolder/$newRouterId
+      mkdir $dataDir/$newRouterId
       if [ $chownString ]; then
-        chown $chownString $totalFolder
+        chown $chownString $totalDir
       fi
       ((newRouterCounter++))
     else
@@ -100,27 +100,31 @@ getMaximumValue() {
   maximumFile="maximum"
   separator=";"
 
-  maximum=$(awk -F";" '($2>=v){v=$2}END{print v}' $dataFolder/$paramRouterId/$paramYesterday)
+  maximum=$(awk -F";" '($2>=v){v=$2}END{print v}' $dataDir/$paramRouterId/$paramYesterday)
   output=$paramYesterday$separator$paramRouterId$separator$maximum$separator
-  echo $output>>$dataFolder/$maximumFile
+  echo $output>>$dataDir/$maximumFile
   if [ $chownString ]; then
-    chown $chownString $dataFolder/$maximumFile
+    chown $chownString $dataDir/$maximumFile
   fi
 }
 
-if [ ! $dataFolder ]; then
-  dataFolder="$workingFolder/freifunkdata"
-elif [ $(echo ${dataFolder} | cut -c1-1) -eq "." ]; then
-  dataFolder=$workingFolder/$(echo ${dataFolder} | tail -c +3)
-elif [ $(echo ${dataFolder} | cut -c1-1) -eq "/" ]; then
-  dataFolder=$dataFolder
+if [ ! $dataDir ]; then
+  dataDir="$workingDir/freifunkdata"
+elif [ $(echo ${dataDir} | cut -c1-1) == "." ]; then
+  #dataDir=$(echo ${dataDir} | tail -c +3)
+  #dataDir="$workingDir/$dataDir"
+  dataDir="$workingDir/$(echo ${dataDir} | tail -c +3)"
+elif [ $(echo ${dataDir} | cut -c1-1) == "/" ]; then
+  dataDir=$dataDir
 else
-  dataFolder="$workingFolder/freifunkdata"
+  dataDir="$workingDir/freifunkdata"
 fi
 
 #set total-folder
-if [ ! $totalFolder ]; then
-  totalFolder="$dataFolder/Total"
+if [ ! $totalDir ]; then
+  totalDataDir="$dataDir/Total"
+else
+  totalDataDir="$dataDir/$totalDir"
 fi
 
 #set chown user and group
@@ -135,25 +139,25 @@ fi
 #if init parameter do setup
 if [ $parameter ]; then
   #check existence of data-folder and create it if it doesn't
-  if [ ! -d $dataFolder ]; then
-    mkdir $dataFolder
+  if [ ! -d $dataDir ]; then
+    mkdir $dataDir
     if [ $chownString ]; then
-      chown $chownString $dataFolder
+      chown $chownString $dataDir
     fi
   fi
 
   #abort script if data-folder could not be created
-  if [ ! -d $dataFolder ]; then
-    echo "ERROR: creating data folder \"$dataFolder\""
+  if [ ! -d $dataDir ]; then
+    echo "ERROR: creating data folder \"$dataDir\""
     echo "check permissions"
     exit 1
   fi
 
   #check existence of total-folder and create it if it doesn't
-  if [ ! -d $totalFolder ]; then
-    mkdir $totalFolder
+  if [ ! -d $totalDataDir ]; then
+    mkdir $totalDataDir
     if [ $chownString ]; then
-      chown $chownString $totalFolder
+      chown $chownString $totalDataDir
     fi
 
     initFunction
@@ -161,8 +165,8 @@ if [ $parameter ]; then
 fi
 
 #abort script if data-folder could not be created
-if [ ! -d $dataFolder ]; then
-  echo "ERROR: data folder \"$dataFolder\" does not exist"
+if [ ! -d $dataDir ]; then
+  echo "ERROR: data folder \"$dataDir\" does not exist"
   echo "run the script with the parameter \"init\" to create data folder structure"
   exit 1
 fi
@@ -173,8 +177,8 @@ dirCounter=0
 date=$(date +"%Y-%m-%d")
 
 #parse data-folder and crawl each router
-for D in `find $dataFolder -type d`; do
-  if [ $D != $dataFolder ]; then
+for D in `find $dataDir -type d`; do
+  if [ $D != $dataDir ]; then
     if [ ! -f $D/disabled ]; then
       routerId=$(basename $D)
       if [ $routerId != $totalDir ]; then
@@ -186,11 +190,11 @@ for D in `find $dataFolder -type d`; do
 done
 
 if [ $dirCounter -ge 1 ]; then
-  if [ ! -f $totalFolder/$date ]; then
+  if [ ! -f $totalDataDir/$date ]; then
     yesterday=$(date +"%Y-%m-%d" -d "yesterday")
-    if [ -f $totalFolder/$yesterday ]; then
-      for D in `find $dataFolder -type d`; do
-        if [ $D != $dataFolder ]; then
+    if [ -f $totalDataDir/$yesterday ]; then
+      for D in `find $dataDir -type d`; do
+        if [ $D != $dataDir ]; then
           if [ -f $D/$yesterday ]; then
             routerId=$(basename $D)
             getMaximumValue $routerId $yesterday
@@ -201,9 +205,9 @@ if [ $dirCounter -ge 1 ]; then
   fi
 
   output=$time$separator$total$separator
-  echo $output>>$totalFolder/$date
+  echo $output>>$totalDataDir/$date
 
   if [ $chownString ]; then
-    chown $chownString $totalFolder/$date
+    chown $chownString $totalDataDir/$date
   fi
 fi

@@ -46,6 +46,12 @@ if(!isset($totalDir)) {
 
 define('TOTALDIR', DATADIR . $totalDir . DS);
 
+if(isset($inlineJavaScript) && $inlineJavaScript) {
+  $javaScript = '<script type="application/javascript">' . file_get_contents(dirname(__FILE__) . DS . 'js' . DS . 'Chart.min.js') . '</script>';
+} else {
+  $javaScript = '<script src="./js/Chart.min.js"></script>';
+}
+
 $date = checkDateParameterOrRedirect();
 $statsDayArray = returnStatsDayArray($date);
 
@@ -303,7 +309,7 @@ $html = <<<HTML
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>$title</title>
-<script src="./js/Chart.min.js"></script>
+$javaScript
 </head>
 <body>
 <div style="width: 95%; margin: auto;">
